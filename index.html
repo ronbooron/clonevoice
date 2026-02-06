@@ -13,10 +13,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
+        .container { max-width: 700px; margin: 0 auto; }
         h1 {
             text-align: center;
             font-size: 28px;
@@ -25,12 +22,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
         .card {
             background: #1a1a2e;
             border-radius: 12px;
@@ -38,18 +30,8 @@
             margin-bottom: 20px;
             border: 1px solid #2a2a4a;
         }
-        .card h2 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card p {
-            color: #999;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
+        .card h2 { font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .card p { color: #999; font-size: 13px; margin-bottom: 12px; }
         .upload-zone {
             border: 2px dashed #3a3a5a;
             border-radius: 8px;
@@ -66,79 +48,62 @@
         .upload-zone .filename { font-size: 13px; color: #6bcb77; margin-top: 8px; }
         audio { width: 100%; margin-top: 12px; border-radius: 8px; }
         .record-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-top: 8px;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #ff4444; color: white; border: none;
+            padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px;
         }
         .record-btn.recording { animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         .clone-btn {
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+            width: 100%; padding: 16px; font-size: 18px; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer;
             background: linear-gradient(135deg, #6b6bff, #ff6b6b);
-            color: white;
-            transition: all 0.2s;
+            color: white; transition: all 0.2s;
         }
         .clone-btn:hover:not(:disabled) { transform: scale(1.02); opacity: 0.9; }
         .clone-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .status {
-            text-align: center;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: none;
+            text-align: center; padding: 12px; margin-top: 12px;
+            border-radius: 8px; font-size: 14px; display: none;
         }
         .status.show { display: block; }
         .status.loading { background: #1a1a3e; color: #8888ff; }
         .status.success { background: #1a2e1a; color: #6bcb77; }
         .status.error { background: #2e1a1a; color: #ff6b6b; }
-        .result-card {
-            display: none;
-            background: #1a2e1a;
-            border: 1px solid #2a4a2a;
-        }
+        .result-card { display: none; background: #1a2e1a; border: 1px solid #2a4a2a; }
         .result-card.show { display: block; }
         .settings { margin-top: 12px; }
         .setting-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
         }
         .setting-row label { font-size: 13px; color: #aaa; }
         .setting-row select, .setting-row input[type="range"] {
-            background: #2a2a4a;
-            color: #e0e0e0;
-            border: 1px solid #3a3a5a;
-            padding: 4px 8px;
-            border-radius: 4px;
+            background: #2a2a4a; color: #e0e0e0; border: 1px solid #3a3a5a;
+            padding: 4px 8px; border-radius: 4px;
         }
-        .timer { font-family: monospace; font-size: 16px; color: #ffd93d; }
+        .server-status { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
+        .server-badge {
+            font-size: 11px; padding: 3px 8px; border-radius: 12px;
+            background: #2a2a4a; color: #888;
+        }
+        .server-badge.trying { background: #1a1a3e; color: #8888ff; }
+        .server-badge.success { background: #1a2e1a; color: #6bcb77; }
+        .server-badge.failed { background: #2e1a1a; color: #ff6b6b; }
+        .tip-box {
+            background: #1a1a2e; border-left: 3px solid #ffd93d; padding: 12px;
+            border-radius: 0 8px 8px 0; margin-top: 10px; font-size: 13px; color: #ccc;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎤 Voice Clone Test</h1>
-        <p class="subtitle">StarPrepAI — Isolated Voice Cloning Test (Seed-VC)</p>
+        <p class="subtitle">StarPrepAI — Hear Yourself Sing Perfectly</p>
 
-        <!-- STEP 1: Song/Source Audio -->
+        <!-- STEP 1 -->
         <div class="card">
             <h2>1️⃣ Song (Source Audio)</h2>
-            <p>Upload any song or audio clip. This is the audio whose vocals will be converted to YOUR voice.</p>
+            <p>Upload any song with vocals. The singing voice will be converted to YOUR voice.</p>
             <div class="upload-zone" id="songZone" onclick="document.getElementById('songInput').click()">
                 <div class="icon">🎵</div>
                 <div class="label">Click to upload a song (mp3, wav, webm, ogg)</div>
@@ -148,10 +113,10 @@
             <audio id="songPreview" controls style="display:none"></audio>
         </div>
 
-        <!-- STEP 2: Voice Sample -->
+        <!-- STEP 2 -->
         <div class="card">
             <h2>2️⃣ Your Voice (Reference Audio)</h2>
-            <p>Upload or record a clip of YOUR voice (5-25 seconds). This is the voice the song will be converted to sound like.</p>
+            <p>Record or upload 10-20 seconds of you <strong>speaking clearly and loudly</strong>.</p>
             <div class="upload-zone" id="voiceZone" onclick="document.getElementById('voiceInput').click()">
                 <div class="icon">🗣️</div>
                 <div class="label">Click to upload your voice sample</div>
@@ -161,31 +126,36 @@
             <div style="text-align:center; margin-top:8px; color:#666;">— or —</div>
             <div style="text-align:center">
                 <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
-                    🔴 Record Your Voice
+                    🔴 Record Your Voice (10-20 sec)
                 </button>
                 <span id="recordTimer" style="margin-left:10px; font-family:monospace; color:#ff4444;"></span>
             </div>
             <audio id="voicePreview" controls style="display:none"></audio>
+            <div class="tip-box">
+                💡 <strong>Tips for best quality:</strong> Speak loudly and clearly, stay close to the mic, quiet room, at least 10 seconds. The better the recording, the better the clone!
+            </div>
         </div>
 
-        <!-- STEP 3: Settings -->
+        <!-- STEP 3 -->
         <div class="card">
             <h2>⚙️ Settings</h2>
             <div class="settings">
                 <div class="setting-row">
                     <label>Mode:</label>
                     <select id="modeSelect">
-                        <option value="singing" selected>🎤 Singing Voice Conversion</option>
-                        <option value="speech">🗣️ Speech Voice Conversion</option>
+                        <option value="singing" selected>🎤 Singing Voice</option>
+                        <option value="speech">🗣️ Speech Voice</option>
                     </select>
                 </div>
                 <div class="setting-row">
-                    <label>Quality (Diffusion Steps): <span id="stepsVal">25</span></label>
-                    <input type="range" id="stepsSlider" min="10" max="100" value="25" oninput="document.getElementById('stepsVal').textContent=this.value">
+                    <label>Quality: <strong id="stepsVal">50</strong> (higher = better but slower)</label>
+                    <input type="range" id="stepsSlider" min="10" max="100" value="50" step="5"
+                        oninput="document.getElementById('stepsVal').textContent=this.value">
                 </div>
                 <div class="setting-row">
-                    <label>Pitch Shift (semitones): <span id="pitchVal">0</span></label>
-                    <input type="range" id="pitchSlider" min="-12" max="12" value="0" oninput="document.getElementById('pitchVal').textContent=this.value">
+                    <label>Pitch Shift: <strong id="pitchVal">0</strong> semitones</label>
+                    <input type="range" id="pitchSlider" min="-12" max="12" value="0"
+                        oninput="document.getElementById('pitchVal').textContent=this.value">
                 </div>
             </div>
         </div>
@@ -194,25 +164,32 @@
         <button class="clone-btn" id="cloneBtn" onclick="startCloning()" disabled>
             🚀 Clone Voice Now
         </button>
+
         <div class="status" id="status"></div>
+        <div class="server-status" id="serverStatus"></div>
 
         <!-- RESULT -->
         <div class="card result-card" id="resultCard">
-            <h2>✅ Cloned Audio Result</h2>
-            <p>Here's the song with YOUR voice:</p>
+            <h2>✅ Your Cloned Voice!</h2>
+            <p>Here's the song with YOUR voice singing it:</p>
             <audio id="resultAudio" controls></audio>
         </div>
     </div>
 
     <script type="module">
         import { Client, handle_file } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
-
-        // Make functions available globally
-        window.Client = Client;
+        window.GradioClient = Client;
         window.handle_file = handle_file;
     </script>
 
     <script>
+        const SERVERS = [
+            { name: "Seed-VC Main", space: "Plachta/Seed-VC" },
+            { name: "Seed-VC (Uniaff)", space: "Uniaff/Seed-VC" },
+            { name: "Seed-VC (antoniomae)", space: "antoniomae/Seed-VC" },
+            { name: "Seed-VC (khavailed1)", space: "khavailed1/Seed-VC" },
+        ];
+
         let songFile = null;
         let voiceFile = null;
         let mediaRecorder = null;
@@ -223,7 +200,6 @@
         function handleFile(type, input) {
             const file = input.files[0];
             if (!file) return;
-
             if (type === 'song') {
                 songFile = file;
                 document.getElementById('songFilename').textContent = file.name;
@@ -241,36 +217,35 @@
             }
             checkReady();
         }
-
         window.handleFile = handleFile;
 
         function checkReady() {
             document.getElementById('cloneBtn').disabled = !(songFile && voiceFile);
         }
 
-        // Recording
         async function toggleRecording() {
             const btn = document.getElementById('recordBtn');
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 btn.classList.remove('recording');
-                btn.textContent = '🔴 Record Your Voice';
+                btn.textContent = '🔴 Record Your Voice (10-20 sec)';
                 clearInterval(recordingTimer);
                 document.getElementById('recordTimer').textContent = '';
                 return;
             }
-
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }
+                });
                 recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
                 mediaRecorder.ondataavailable = (e) => {
                     if (e.data.size > 0) recordedChunks.push(e.data);
                 };
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                     voiceFile = new File([blob], 'my-voice.webm', { type: 'audio/webm' });
-                    document.getElementById('voiceFilename').textContent = `Recorded (${recordingSeconds}s)`;
+                    document.getElementById('voiceFilename').textContent = 'Recorded (' + recordingSeconds + 's)';
                     document.getElementById('voiceZone').classList.add('has-file');
                     const preview = document.getElementById('voicePreview');
                     preview.src = URL.createObjectURL(blob);
@@ -284,11 +259,11 @@
                 recordingSeconds = 0;
                 recordingTimer = setInterval(() => {
                     recordingSeconds++;
-                    document.getElementById('recordTimer').textContent = `${recordingSeconds}s`;
+                    document.getElementById('recordTimer').textContent = recordingSeconds + 's';
                     if (recordingSeconds >= 25) {
                         mediaRecorder.stop();
                         btn.classList.remove('recording');
-                        btn.textContent = '🔴 Record Your Voice';
+                        btn.textContent = '🔴 Record Your Voice (10-20 sec)';
                         clearInterval(recordingTimer);
                     }
                 }, 1000);
@@ -298,92 +273,133 @@
         }
         window.toggleRecording = toggleRecording;
 
-        // CLONE
-        async function startCloning() {
-            if (!songFile || !voiceFile) return;
+        function updateServerBadge(index, status) {
+            const container = document.getElementById('serverStatus');
+            let badge = document.getElementById('server-' + index);
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.id = 'server-' + index;
+                badge.className = 'server-badge';
+                container.appendChild(badge);
+            }
+            badge.textContent = SERVERS[index].name;
+            badge.className = 'server-badge ' + status;
+        }
 
-            const statusEl = document.getElementById('status');
-            const cloneBtn = document.getElementById('cloneBtn');
-            const resultCard = document.getElementById('resultCard');
+        async function tryServer(serverIndex) {
+            const server = SERVERS[serverIndex];
+            updateServerBadge(serverIndex, 'trying');
 
-            statusEl.className = 'status show loading';
-            statusEl.textContent = '⏳ Connecting to Seed-VC...';
-            cloneBtn.disabled = true;
-            resultCard.classList.remove('show');
+            const app = await window.GradioClient.connect(server.space);
 
-            const startTime = Date.now();
-            const timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const mins = Math.floor(elapsed / 60);
-                const secs = elapsed % 60;
-                const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-                if (statusEl.classList.contains('loading')) {
-                    statusEl.textContent = statusEl.textContent.split('(')[0].trim() + ` (${timeStr})`;
-                }
-            }, 1000);
+            const isSinging = document.getElementById('modeSelect').value === 'singing';
+            const steps = parseInt(document.getElementById('stepsSlider').value);
+            const pitch = parseInt(document.getElementById('pitchSlider').value);
 
+            // Try V1 endpoint (predict_1) - voice & singing voice conversion
             try {
-                statusEl.textContent = '⏳ Connecting to Seed-VC on HuggingFace...';
-
-                const app = await window.Client.connect("Plachta/Seed-VC");
-
-                const isSinging = document.getElementById('modeSelect').value === 'singing';
-                const steps = parseInt(document.getElementById('stepsSlider').value);
-                const pitch = parseInt(document.getElementById('pitchSlider').value);
-
-                statusEl.textContent = '🎤 Uploading audio files and cloning voice... This may take 1-5 minutes.';
-
-                // Call V1 endpoint (predict_1) for singing voice conversion
-                // Inputs: source_audio, reference_audio, diffusion_steps, length_adjust, cfg_rate, f0_conditioned, auto_f0, pitch_shift
                 const result = await app.predict("/predict_1", [
-                    window.handle_file(songFile),     // Source audio (the song)
+                    window.handle_file(songFile),     // Source audio
                     window.handle_file(voiceFile),     // Reference audio (your voice)
                     steps,                              // Diffusion steps
                     1.0,                                // Length adjust
                     0.7,                                // Inference CFG rate
                     isSinging,                          // F0 conditioned (true for singing)
                     true,                               // Auto F0 adjust
-                    pitch                               // Pitch shift in semitones
+                    pitch                               // Pitch shift semitones
                 ]);
+                return result;
+            } catch (e1) {
+                console.log('V1 failed on ' + server.name + ':', e1.message);
+                // Try V2 as fallback
+                try {
+                    const result = await app.predict("/predict", [
+                        window.handle_file(songFile),
+                        window.handle_file(voiceFile),
+                        steps,
+                        1.0,
+                        0.0,
+                        0.7,
+                        0.9,
+                        1.0,
+                        1.0,
+                        false,
+                        false
+                    ]);
+                    return result;
+                } catch (e2) {
+                    console.log('V2 also failed on ' + server.name + ':', e2.message);
+                    throw e2;
+                }
+            }
+        }
 
-                clearInterval(timerInterval);
-                console.log('Result:', result);
+        async function startCloning() {
+            if (!songFile || !voiceFile) return;
 
-                // The result should contain the output audio
-                // result.data[0] = stream output, result.data[1] = full output
-                if (result && result.data) {
-                    let audioUrl = null;
+            const statusEl = document.getElementById('status');
+            const cloneBtn = document.getElementById('cloneBtn');
+            const resultCard = document.getElementById('resultCard');
+            const serverStatusEl = document.getElementById('serverStatus');
 
-                    // Try full output first (index 1), then stream (index 0)
-                    for (let i = result.data.length - 1; i >= 0; i--) {
-                        const item = result.data[i];
-                        if (item && item.url) {
-                            audioUrl = item.url;
-                            break;
+            statusEl.className = 'status show loading';
+            cloneBtn.disabled = true;
+            resultCard.classList.remove('show');
+            serverStatusEl.innerHTML = '';
+
+            const startTime = Date.now();
+            let baseMsg = 'Processing...';
+            const timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = Math.floor(elapsed / 60);
+                const secs = elapsed % 60;
+                const timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+                statusEl.textContent = baseMsg + ' (' + timeStr + ')';
+            }, 1000);
+
+            let lastError = null;
+
+            for (let i = 0; i < SERVERS.length; i++) {
+                try {
+                    baseMsg = '🎤 Trying ' + SERVERS[i].name + '...';
+                    statusEl.textContent = baseMsg;
+
+                    const result = await tryServer(i);
+
+                    if (result && result.data) {
+                        let audioUrl = null;
+                        for (let j = result.data.length - 1; j >= 0; j--) {
+                            const item = result.data[j];
+                            if (item && item.url) {
+                                audioUrl = item.url;
+                                break;
+                            }
+                        }
+                        if (audioUrl) {
+                            clearInterval(timerInterval);
+                            updateServerBadge(i, 'success');
+                            document.getElementById('resultAudio').src = audioUrl;
+                            resultCard.classList.add('show');
+                            statusEl.className = 'status show success';
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                            statusEl.textContent = '✅ Voice cloned via ' + SERVERS[i].name + '! (' + elapsed + 's)';
+                            cloneBtn.disabled = false;
+                            return;
                         }
                     }
+                    throw new Error('No audio in result');
 
-                    if (audioUrl) {
-                        document.getElementById('resultAudio').src = audioUrl;
-                        resultCard.classList.add('show');
-                        statusEl.className = 'status show success';
-                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                        statusEl.textContent = `✅ Voice cloning complete! (${elapsed}s) — Listen below!`;
-                    } else {
-                        throw new Error('No audio URL in result: ' + JSON.stringify(result.data));
-                    }
-                } else {
-                    throw new Error('No result data received');
+                } catch (error) {
+                    console.error(SERVERS[i].name + ' failed:', error);
+                    updateServerBadge(i, 'failed');
+                    lastError = error;
                 }
-
-            } catch (error) {
-                clearInterval(timerInterval);
-                console.error('Clone error:', error);
-                statusEl.className = 'status show error';
-                statusEl.textContent = '❌ Error: ' + error.message;
-            } finally {
-                cloneBtn.disabled = false;
             }
+
+            clearInterval(timerInterval);
+            statusEl.className = 'status show error';
+            statusEl.textContent = '❌ All servers busy. Wait a few minutes and try again. (' + (lastError?.message || 'Unknown error') + ')';
+            cloneBtn.disabled = false;
         }
         window.startCloning = startCloning;
     </script>
