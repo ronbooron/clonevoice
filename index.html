@@ -93,6 +93,12 @@
             background: #1a1a2e; border-left: 3px solid #ffd93d; padding: 12px;
             border-radius: 0 8px 8px 0; margin-top: 10px; font-size: 13px; color: #ccc;
         }
+        .log-box {
+            background: #111; border: 1px solid #333; border-radius: 8px;
+            padding: 12px; margin-top: 12px; font-family: monospace; font-size: 11px;
+            color: #888; max-height: 150px; overflow-y: auto; display: none;
+        }
+        .log-box.show { display: block; }
     </style>
 </head>
 <body>
@@ -143,13 +149,13 @@
                 <div class="setting-row">
                     <label>Mode:</label>
                     <select id="modeSelect">
-                        <option value="singing" selected>🎤 Singing Voice</option>
-                        <option value="speech">🗣️ Speech Voice</option>
+                        <option value="singing" selected>🎤 Singing Voice (V1)</option>
+                        <option value="speech">🗣️ Speech/Style Voice (V2)</option>
                     </select>
                 </div>
                 <div class="setting-row">
-                    <label>Quality: <strong id="stepsVal">50</strong> (higher = better but slower)</label>
-                    <input type="range" id="stepsSlider" min="10" max="100" value="50" step="5"
+                    <label>Quality: <strong id="stepsVal">25</strong> (higher = better but slower)</label>
+                    <input type="range" id="stepsSlider" min="10" max="100" value="25" step="5"
                         oninput="document.getElementById('stepsVal').textContent=this.value">
                 </div>
                 <div class="setting-row">
@@ -167,6 +173,7 @@
 
         <div class="status" id="status"></div>
         <div class="server-status" id="serverStatus"></div>
+        <div class="log-box" id="logBox"></div>
 
         <!-- RESULT -->
         <div class="card result-card" id="resultCard">
@@ -187,7 +194,6 @@
             { name: "Seed-VC Main", space: "Plachta/Seed-VC" },
             { name: "Seed-VC (Uniaff)", space: "Uniaff/Seed-VC" },
             { name: "Seed-VC (antoniomae)", space: "antoniomae/Seed-VC" },
-            { name: "Seed-VC (khavailed1)", space: "khavailed1/Seed-VC" },
         ];
 
         let songFile = null;
@@ -197,9 +203,18 @@
         let recordingTimer = null;
         let recordingSeconds = 0;
 
+        function addLog(msg) {
+            const box = document.getElementById('logBox');
+            box.classList.add('show');
+            const time = new Date().toLocaleTimeString();
+            box.innerHTML += '[' + time + '] ' + msg + '<br>';
+            box.scrollTop = box.scrollHeight;
+        }
+
         function handleFile(type, input) {
             const file = input.files[0];
             if (!file) return;
+            addLog('Loaded ' + type + ': ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)');
             if (type === 'song') {
                 songFile = file;
                 document.getElementById('songFilename').textContent = file.name;
@@ -239,10 +254,10 @@
                 });
                 recordedChunks = [];
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-                mediaRecorder.ondataavailable = (e) => {
+                mediaRecorder.ondataavailable = function(e) {
                     if (e.data.size > 0) recordedChunks.push(e.data);
                 };
-                mediaRecorder.onstop = () => {
+                mediaRecorder.onstop = function() {
                     const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                     voiceFile = new File([blob], 'my-voice.webm', { type: 'audio/webm' });
                     document.getElementById('voiceFilename').textContent = 'Recorded (' + recordingSeconds + 's)';
@@ -250,14 +265,15 @@
                     const preview = document.getElementById('voicePreview');
                     preview.src = URL.createObjectURL(blob);
                     preview.style.display = 'block';
-                    stream.getTracks().forEach(t => t.stop());
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                    addLog('Recorded voice: ' + (blob.size / 1024).toFixed(1) + ' KB, ' + recordingSeconds + 's');
                     checkReady();
                 };
                 mediaRecorder.start();
                 btn.classList.add('recording');
                 btn.textContent = '⬛ Stop Recording';
                 recordingSeconds = 0;
-                recordingTimer = setInterval(() => {
+                recordingTimer = setInterval(function() {
                     recordingSeconds++;
                     document.getElementById('recordTimer').textContent = recordingSeconds + 's';
                     if (recordingSeconds >= 25) {
@@ -274,8 +290,8 @@
         window.toggleRecording = toggleRecording;
 
         function updateServerBadge(index, status) {
-            const container = document.getElementById('serverStatus');
-            let badge = document.getElementById('server-' + index);
+            var container = document.getElementById('serverStatus');
+            var badge = document.getElementById('server-' + index);
             if (!badge) {
                 badge = document.createElement('span');
                 badge.id = 'server-' + index;
@@ -286,111 +302,150 @@
             badge.className = 'server-badge ' + status;
         }
 
+        // Try V1 singing endpoint
+        async function tryV1(app, steps, pitch) {
+            addLog('Trying V1 endpoint (/predict_1) for singing...');
+            var result = await app.predict("/predict_1", [
+                window.handle_file(songFile),      // source_audio_path
+                window.handle_file(voiceFile),      // target_audio_path
+                steps,                               // diffusion_steps
+                1.0,                                 // length_adjust
+                0.7,                                 // inference_cfg_rate
+                true,                                // f0_condition (MUST be true for singing)
+                true,                                // auto_f0_adjust
+                pitch                                // pitch_shift
+            ]);
+            return result;
+        }
+
+        // Try V2 voice/style endpoint
+        async function tryV2(app, steps) {
+            addLog('Trying V2 endpoint (/predict) for voice/style...');
+            var result = await app.predict("/predict", [
+                window.handle_file(songFile),      // source_audio_path
+                window.handle_file(voiceFile),      // target_audio_path
+                steps,                               // diffusion_steps
+                1.0,                                 // length_adjust
+                0.0,                                 // intelligebility_cfg_rate
+                0.7,                                 // similarity_cfg_rate
+                0.9,                                 // top_p
+                1.0,                                 // temperature
+                1.0,                                 // repetition_penalty
+                false,                               // convert_style
+                false                                // anonymization_only
+            ]);
+            return result;
+        }
+
         async function tryServer(serverIndex) {
-            const server = SERVERS[serverIndex];
+            var server = SERVERS[serverIndex];
             updateServerBadge(serverIndex, 'trying');
+            addLog('Connecting to ' + server.name + ' (' + server.space + ')...');
 
-            const app = await window.GradioClient.connect(server.space);
+            var app = await window.GradioClient.connect(server.space);
+            addLog('Connected to ' + server.name);
 
-            const isSinging = document.getElementById('modeSelect').value === 'singing';
-            const steps = parseInt(document.getElementById('stepsSlider').value);
-            const pitch = parseInt(document.getElementById('pitchSlider').value);
+            var isSinging = document.getElementById('modeSelect').value === 'singing';
+            var steps = parseInt(document.getElementById('stepsSlider').value);
+            var pitch = parseInt(document.getElementById('pitchSlider').value);
 
-            // Try V1 endpoint (predict_1) - voice & singing voice conversion
-            try {
-                const result = await app.predict("/predict_1", [
-                    window.handle_file(songFile),     // Source audio
-                    window.handle_file(voiceFile),     // Reference audio (your voice)
-                    steps,                              // Diffusion steps
-                    1.0,                                // Length adjust
-                    0.7,                                // Inference CFG rate
-                    isSinging,                          // F0 conditioned (true for singing)
-                    true,                               // Auto F0 adjust
-                    pitch                               // Pitch shift semitones
-                ]);
-                return result;
-            } catch (e1) {
-                console.log('V1 failed on ' + server.name + ':', e1.message);
-                // Try V2 as fallback
+            // Try the appropriate endpoint based on mode
+            if (isSinging) {
                 try {
-                    const result = await app.predict("/predict", [
-                        window.handle_file(songFile),
-                        window.handle_file(voiceFile),
-                        steps,
-                        1.0,
-                        0.0,
-                        0.7,
-                        0.9,
-                        1.0,
-                        1.0,
-                        false,
-                        false
-                    ]);
-                    return result;
-                } catch (e2) {
-                    console.log('V2 also failed on ' + server.name + ':', e2.message);
-                    throw e2;
+                    return await tryV1(app, steps, pitch);
+                } catch (e1) {
+                    addLog('V1 error: ' + e1.message);
+                    // If V1 fails, try V2 as fallback
+                    try {
+                        return await tryV2(app, steps);
+                    } catch (e2) {
+                        addLog('V2 fallback error: ' + e2.message);
+                        throw e2;
+                    }
+                }
+            } else {
+                try {
+                    return await tryV2(app, steps);
+                } catch (e1) {
+                    addLog('V2 error: ' + e1.message);
+                    // If V2 fails, try V1 as fallback
+                    try {
+                        return await tryV1(app, steps, pitch);
+                    } catch (e2) {
+                        addLog('V1 fallback error: ' + e2.message);
+                        throw e2;
+                    }
                 }
             }
+        }
+
+        function extractAudioUrl(result) {
+            if (!result || !result.data) return null;
+            // Result has 2 outputs: stream and full. We want the full output (index 1)
+            for (var j = result.data.length - 1; j >= 0; j--) {
+                var item = result.data[j];
+                if (item && item.url) return item.url;
+                if (item && typeof item === 'string' && item.startsWith('http')) return item;
+            }
+            return null;
         }
 
         async function startCloning() {
             if (!songFile || !voiceFile) return;
 
-            const statusEl = document.getElementById('status');
-            const cloneBtn = document.getElementById('cloneBtn');
-            const resultCard = document.getElementById('resultCard');
-            const serverStatusEl = document.getElementById('serverStatus');
+            var statusEl = document.getElementById('status');
+            var cloneBtn = document.getElementById('cloneBtn');
+            var resultCard = document.getElementById('resultCard');
+            var serverStatusEl = document.getElementById('serverStatus');
 
             statusEl.className = 'status show loading';
             cloneBtn.disabled = true;
             resultCard.classList.remove('show');
             serverStatusEl.innerHTML = '';
+            document.getElementById('logBox').innerHTML = '';
 
-            const startTime = Date.now();
-            let baseMsg = 'Processing...';
-            const timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const mins = Math.floor(elapsed / 60);
-                const secs = elapsed % 60;
-                const timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+            addLog('Starting voice clone...');
+            addLog('Song: ' + songFile.name + ' (' + (songFile.size / 1024).toFixed(1) + ' KB)');
+            addLog('Voice: ' + voiceFile.name + ' (' + (voiceFile.size / 1024).toFixed(1) + ' KB)');
+
+            var startTime = Date.now();
+            var baseMsg = 'Processing...';
+            var timerInterval = setInterval(function() {
+                var elapsed = Math.floor((Date.now() - startTime) / 1000);
+                var mins = Math.floor(elapsed / 60);
+                var secs = elapsed % 60;
+                var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
                 statusEl.textContent = baseMsg + ' (' + timeStr + ')';
             }, 1000);
 
-            let lastError = null;
+            var lastError = null;
 
-            for (let i = 0; i < SERVERS.length; i++) {
+            for (var i = 0; i < SERVERS.length; i++) {
                 try {
                     baseMsg = '🎤 Trying ' + SERVERS[i].name + '...';
                     statusEl.textContent = baseMsg;
 
-                    const result = await tryServer(i);
+                    var result = await tryServer(i);
+                    var audioUrl = extractAudioUrl(result);
 
-                    if (result && result.data) {
-                        let audioUrl = null;
-                        for (let j = result.data.length - 1; j >= 0; j--) {
-                            const item = result.data[j];
-                            if (item && item.url) {
-                                audioUrl = item.url;
-                                break;
-                            }
-                        }
-                        if (audioUrl) {
-                            clearInterval(timerInterval);
-                            updateServerBadge(i, 'success');
-                            document.getElementById('resultAudio').src = audioUrl;
-                            resultCard.classList.add('show');
-                            statusEl.className = 'status show success';
-                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                            statusEl.textContent = '✅ Voice cloned via ' + SERVERS[i].name + '! (' + elapsed + 's)';
-                            cloneBtn.disabled = false;
-                            return;
-                        }
+                    if (audioUrl) {
+                        clearInterval(timerInterval);
+                        updateServerBadge(i, 'success');
+                        addLog('SUCCESS! Audio URL: ' + audioUrl);
+                        document.getElementById('resultAudio').src = audioUrl;
+                        resultCard.classList.add('show');
+                        statusEl.className = 'status show success';
+                        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+                        statusEl.textContent = '✅ Voice cloned via ' + SERVERS[i].name + '! (' + elapsed + 's)';
+                        cloneBtn.disabled = false;
+                        return;
                     }
+
+                    addLog('No audio URL in result: ' + JSON.stringify(result.data).substring(0, 200));
                     throw new Error('No audio in result');
 
                 } catch (error) {
-                    console.error(SERVERS[i].name + ' failed:', error);
+                    addLog(SERVERS[i].name + ' FAILED: ' + error.message);
                     updateServerBadge(i, 'failed');
                     lastError = error;
                 }
@@ -398,10 +453,12 @@
 
             clearInterval(timerInterval);
             statusEl.className = 'status show error';
-            statusEl.textContent = '❌ All servers busy. Wait a few minutes and try again. (' + (lastError?.message || 'Unknown error') + ')';
+            statusEl.textContent = '❌ All servers busy. Wait a few minutes and try again.';
+            addLog('All servers failed. Last error: ' + (lastError ? lastError.message : 'unknown'));
             cloneBtn.disabled = false;
         }
         window.startCloning = startCloning;
     </script>
 </body>
 </html>
+
